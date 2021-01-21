@@ -11,7 +11,7 @@ def create_slim_net(input_shape, base_channel, num_classes):
     print('input shapes', input_shape[0], input_shape[1])
 
     input_node = tf.keras.layers.Input(
-        shape=(input_shape[0], input_shape[1], 3))
+        shape=(input_shape[0], input_shape[1], 3), batch_size=1)
 
     net = conv_bn(input_node, base_channel, stride=2,
                   prefix='basenet.0')  # 120x160
@@ -74,14 +74,14 @@ def create_slim_net(input_shape, base_channel, num_classes):
 if __name__=="__main__":
     model = create_slim_net((240, 320), 16, 2)
 
-    torch_path = "/Users/grigorysamokhin/Desktop/Ultraface_tflite/models/pretrained/version-slim-320.pth"
+    torch_path = "/Users/grigorysamokhin/Documents/NN_Models/ultra_face_tflite/models/pretrained/version-slim-320.pth"
     mapping_table = "mapping_tables/slim_320.json"
 
     load_weight(model, torch_path, mapping_table)
     converter = tf.lite.TFLiteConverter.from_keras_model(model)
 
     converter.optimizations = [tf.lite.Optimize.DEFAULT]
-    # converter.target_spec.supported_types = [tf.float16]
+    converter.target_spec.supported_types = [tf.float16]
 
     tflite_model = converter.convert()
     # Save the model.
